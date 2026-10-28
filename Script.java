@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 /**
- * Local Proxy Browser.
+ * Bush Local Browser.
  * A local HTTP proxy launcher with a modern Swing interface.
  * HTTPS traffic is tunneled without decryption.
  */
@@ -90,7 +90,7 @@ public final class Script {
         proxy.start();
         Runtime.getRuntime().addShutdownHook(new Thread(proxy::close, "Bush-shutdown"));
 
-        System.out.println("Local Proxy Browser");
+        System.out.println("Bush Local Browser");
         System.out.println("Proxy:   http://127.0.0.1:" + proxy.port());
         System.out.println("Privacy: HTTPS is tunneled without decryption");
 
@@ -113,7 +113,7 @@ public final class Script {
 
     private static void printHelp() {
         System.out.println("""
-                Local Proxy Browser
+                Local Java Proxy
 
                 Usage:
                   javac -d out Script.java
@@ -129,7 +129,7 @@ public final class Script {
                   --help              Show this help
 
                 The proxy listens only on 127.0.0.1. HTTPS uses CONNECT tunneling;
-                The proxy cannot inspect or modify encrypted page contents.
+                Proxy cannot inspect or modify encrypted page contents.
                 """);
     }
 
@@ -198,7 +198,7 @@ public final class Script {
 
     private static Process launchBrowser(Browser kind, Path exe, int port, String url)
             throws IOException {
-        Path root = Path.of(System.getProperty("user.home"), ".Bush-local-browser");
+        Path root = Path.of(System.getProperty("user.home"), ".Local-java-proxy");
         Path profile = root.resolve(kind.profileName);
         Files.createDirectories(profile);
 
@@ -238,7 +238,7 @@ public final class Script {
         private static final AtomicLong CONNECTIONS = new AtomicLong();
 
         private final ExecutorService workers = Executors.newCachedThreadPool(r -> {
-            Thread thread = new Thread(r, "Bush-proxy-worker");
+            Thread thread = new Thread(r, "Local-java-proxy");
             thread.setDaemon(true);
             return thread;
         });
@@ -266,7 +266,7 @@ public final class Script {
                         if (!server.isClosed()) log.accept("Proxy accept error: " + error.getMessage());
                     }
                 }
-            }, "Bush-proxy-acceptor");
+            }, "Local-proxy-acceptor");
             acceptor.setDaemon(true);
             acceptor.start();
         }
@@ -312,7 +312,7 @@ public final class Script {
                 throws IOException {
             try (Socket upstream = connect(target)) {
                 clientOut.write(("HTTP/1.1 200 Connection Established\r\n"
-                        + "Proxy-Agent: BushLocal/1.0\r\n\r\n")
+                        + "Proxy-Agent: Local/1.0\r\n\r\n")
                         .getBytes(StandardCharsets.ISO_8859_1));
                 clientOut.flush();
                 relayBothWays(clientIn, clientOut, upstream, client);
@@ -513,7 +513,7 @@ public final class Script {
         private Rectangle restoreBounds;
 
         BushWindow(int port, String url) {
-            super("Local Proxy Browser");
+            super("Local Java Proxy");
             setUndecorated(true);
             setDefaultCloseOperation(EXIT_ON_CLOSE);
             setSize(680, 760);
@@ -714,7 +714,7 @@ public final class Script {
             bar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, BORDER));
             bar.setPreferredSize(new Dimension(100, 44));
 
-            JLabel title = new JLabel("  LOCAL PROXY BROWSER");
+            JLabel title = new JLabel("  LOCAL JAVA PROXY | V1.0 | https://github.com/themanthemyththelegends/local-java-proxy");
             title.setForeground(TEXT);
             title.setFont(new Font("Segoe UI", Font.BOLD, 12));
             bar.add(title, BorderLayout.CENTER);
@@ -961,7 +961,7 @@ public final class Script {
             JPanel panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
             panel.setOpaque(false);
-            JLabel title = new JLabel("Local Proxy Browser");
+            JLabel title = new JLabel("Local Java Proxy");
             title.setForeground(TEXT);
             title.setFont(new Font("Segoe UI", Font.BOLD, 26));
             JLabel sub = new JLabel("A cleaner way to browse through your local proxy.");
@@ -1063,7 +1063,7 @@ public final class Script {
                     appendLog("A browser process closed.");
                     if (remaining <= 0 && autoStop.isSelected()) stopProxy();
                 });
-            }, "Bush-browser-watcher");
+            }, "Local-browser-watcher");
             watcher.setDaemon(true);
             watcher.start();
         }
@@ -1087,7 +1087,7 @@ public final class Script {
         }
 
         private void error(String message) {
-            JOptionPane.showMessageDialog(this, message, "Local Proxy Browser",
+            JOptionPane.showMessageDialog(this, message, "Local Java Proxy",
                     JOptionPane.ERROR_MESSAGE);
         }
 
